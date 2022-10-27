@@ -35,6 +35,9 @@ int main (int argc, char const *argv[]){
         quizVector.push_back(quiz1);
     }
 
+    //Initialize random number generator
+    srand(unsigned(time(0)));
+
     //Shuffle the vector randomly 
     random_shuffle(quizVector.begin(), quizVector.end());
 
