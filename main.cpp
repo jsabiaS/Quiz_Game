@@ -41,8 +41,8 @@ int main (int argc, char const *argv[]){
     //Shuffle the vector randomly 
     random_shuffle(quizVector.begin(), quizVector.end());
 
-
-    for(vector<Quiz>::size_type i = 0; i != quizVector.size() - 1; ++i) {
+    //For loop to go through through the size of the vector based on how many questions are in the .txt
+    for(vector<Quiz>::size_type i = 1; i != quizVector.size() - 1; ++i) {
         //variable def to be used to get the answer from the text file and to hold user input
         string inputAnswer;
         string correctAnswer = quizVector[i].getAnswer();
@@ -50,6 +50,7 @@ int main (int argc, char const *argv[]){
         //Prints the question to the user
         cout << quizVector[i].getQuestion() << endl;
         //Get line extracts characters from input and holds them into a string 
+        cout << "Type in your answer: ";
         getline(cin, inputAnswer);
         
         //Temp variable holds true or fallse for the comparison
