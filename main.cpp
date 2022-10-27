@@ -1,71 +1,73 @@
+//Justin Sabia
+
 #include <iostream>
-#include <string>
-#include <algorithm> 
 #include <vector>
-#include <iomanip>
 #include <fstream>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+#include <random>
+#include <chrono>
+
 #include "Quiz.h"
 #include "printResult.h"
 
 using namespace std;
 
-vector<Quiz> parseDatabase(string fileName) {
-	vector<Quiz> quizVector;
-	ifstream file1;
-	file1.open(fileName);
-	if (file1.is_open()) {
-		string line;
-		while (getline(file1, line)) {
-			if (line.substr(0, 2) == "Q:") {
-				string question = line.substr(2);
-				getline(file1, line);
-				if (line.substr(0, 2) == "A:") {
-					string answer = line.substr(2);
-					quizVector.emplace_back(Quiz(question, answer));
-				}
-			}
-		}
-	}
-	file1.close();
-	//randomly shuffle the vector before returning
-    srand(time(0));
-	random_shuffle(quizVector.begin(), quizVector.end());
-	return quizVector;
-}
+//Main definition
+int main (int argc, char const *argv[]){
+    ifstream inputfile;
+    vector<Quiz> quizVector;
+    string question;
+    string answer;
+    inputfile.open(argv[1]);
 
-int main(int argc, char *argv[]) {
-
-    vector<Quiz> quizVector = parseDatabase(argv[1]);
-    int numQuestions = quizVector.size();
     int numCorrect = 0;
     int numWrong = 0;
-    int userScore = 0;
 
-    srand(time(0));
-
-    while (numQuestions > 0) {
-
-        Quiz quiz1;
-
-        cout << quiz1.getQuestion() << endl;
-        string answer;
-        cin >> answer;
-
-        if (answer == quiz1.getAnswer()) {
-            cout << "Correct!" << endl;
-            userScore++;
-            numCorrect++;
-        }
-        else {
-            cout << "Wrong! Correct answer: " << quiz1.getAnswer() << endl;
-            userScore--;
-            numWrong++;
-        }
-        cout << "Current Score: " << userScore << endl;
-        numQuestions--;
-        quizVector.erase(quizVector.begin());
+    //While the program hasnt reached the end of the .txt file
+    while (!inputfile.eof()){
+        getline(inputfile, question);
+        question.erase(0,3);
+        getline(inputfile, answer);
+        answer.erase(0,3);
+        Quiz quiz1(question, answer);
+        quizVector.push_back(quiz1);
     }
 
-    printResult(numQuestions, numCorrect, numWrong);
+    //Shuffle the vector randomly 
+    random_shuffle(quizVector.begin(), quizVector.end());
+
+
+    for(vector<Quiz>::size_type i = 0; i != quizVector.size() - 1; ++i) {
+        //variable def to be used to get the answer from the text file and to hold user input
+        string inputAnswer;
+        string correctAnswer = quizVector[i].getAnswer();
+
+        //Prints the question to the user
+        cout << quizVector[i].getQuestion() << endl;
+        //Get line extracts characters from input and holds them into a string 
+        getline(cin, inputAnswer);
+        
+        //Temp variable holds true or fallse for the comparison
+        int temp = inputAnswer.compare(correctAnswer);
+        //If the user answer matches the correct answer it is true
+        if (temp == 0){
+            quizVector[i].updateScore(1);
+            ++numCorrect;
+            cout << "Correct!" << endl;
+        }
+        //if they do not match the users answer was wrong and it will add on to the number of wrong answers
+        else {
+            quizVector[i].updateScore(-1);
+            ++numWrong;
+            cout << "Wrong! Correct Answer: " << correctAnswer << endl;
+        }
+        //Output the current score to the user after each question
+        cout << "Current Score: " << Quiz::getScore() << endl;
+    }
+
+    cout << printResult(quizVector.size() - 1, numCorrect, numWrong);
+
     return 0;
 }
